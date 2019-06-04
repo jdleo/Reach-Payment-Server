@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 //for generating customer id from auth token
 router.post('/me/account_id/', async (req, res, next) => {
     if (req.body.auth_code) {
-        var dataString = `client_secret=sk_test_t1rMxmpgLmoCQV4g1p2LfExG0080oRaHN4&code=${req.body.auth_code}&grant_type=authorization_code`;
+        var dataString = `client_secret=${process.env.STRIPE_PRIVATE_KEY}&code=${req.body.auth_code}&grant_type=authorization_code`;
 
         var options = {
             url: 'https://connect.stripe.com/oauth/token',
