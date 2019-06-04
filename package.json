@@ -1,0 +1,22 @@
+{
+  "name": "reach-server",
+  "version": "1.0.0",
+  "description": "Payment server for Reach",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdleo/Reach-Payment-Server.git"
+  },
+  "keywords": [
+    "Reach"
+  ],
+  "author": "John Leonardo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jdleo/Reach-Payment-Server/issues"
+  },
+  "homepage": "https://github.com/jdleo/Reach-Payment-Server#readme"
+}
