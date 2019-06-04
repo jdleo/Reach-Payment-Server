@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 
 //API routes for brands and influencers (used by mobile app) 
 app.use('/api/brands', require('./routes/api/brands'));
+app.use('/api/influencers', require('./routes/api/influencers'));
 
 //google cloud health check
 app.get('/_ah/health', (req, res) => {

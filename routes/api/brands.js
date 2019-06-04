@@ -34,7 +34,7 @@ router.post('/me/create', async (req, res, next) => {
                     //console.log(err);
                     res.sendStatus(500);
                 } else {
-                    res.send(customer.id);
+                    res.status(200).send(customer.id);
                 }
             });
         } catch (err) {
