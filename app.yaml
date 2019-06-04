@@ -1,2 +1,6 @@
 runtime: nodejs
 env: flex
+
+env_variables:
+  STRIPE_PUB_KEY: 'pk_test_YaTGm0iYo5slH0tEaI8f6ITM'
+  STRIPE_PRIVATE_KEY: 'sk_test_t1rMxmpgLmoCQV4g1p2LfExG0080oRaHN4' 
