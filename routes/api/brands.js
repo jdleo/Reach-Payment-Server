@@ -33,7 +33,7 @@ router.post('/charge', async (req, res, next) => {
 
         if (!isNaN(amount)) {
             //amount is parseable to int, calculate transfer amount
-            var amountToDestination = (amount - 300) / (1 + fee);
+            var amountToDestination = (amount - 30) / (1 + fee);
             //calculate amount after fees
             var totalFees = amount - amountToDestination;
 
