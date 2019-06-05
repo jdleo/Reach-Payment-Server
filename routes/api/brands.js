@@ -34,9 +34,9 @@ router.post('/charge', async (req, res, next) => {
 
         if (!isNaN(amount)) {
             //amount is parseable to int
-            var amount = parseInt(amount);
+            amount = parseInt(amount);
             //calculate fees
-            var fees = amount * fees;
+            var fees = amount * fee;
             //calculate total with fees (parseInt just in case)
             var totalWithFees = parseInt(amount + fees);
             //try to create stripe charge
