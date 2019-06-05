@@ -1,4 +1,5 @@
-const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
+const pk = process.env.STRIPE_PRIVATE_KEY;
+const stripe = require('stripe')(pk);
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
@@ -19,6 +20,54 @@ router.post('/me/ephemeral_keys/', async (req, res, next) => {
         //console.log(err.message);
         res.status(500).end();
     });
+});
+
+//for creating destination charge
+router.post('/charge', async (req, res, next) => {
+    if (req.body.amount && req.body.destination && req.body.source) {
+    	//variables
+        var amount = parseInt(req.body.amount);
+        var destination = req.body.destination;
+        var source = req.body.source;
+        var fee = 0.06
+
+        if (!isNaN(amount)) {
+            //amount is parseable to int, calculate transfer amount
+            var amountToDestination = amount / (1 + fee);
+            //calculate amount after fees
+            var totalFees = amount - amountToDestination;
+
+            console.log(amount, amountToDestination, totalFees);
+
+            try {
+                stripe.charges.create({
+                    amount: amount,
+                    currency: "usd",
+                    source: source,
+                    transfer_data: {
+                        amount: amountToDestination,
+                        destination: destination,
+                    },
+                }).then(function(err, charge) {
+                    // asynchronously called
+                    if (err) {
+                        //console.log(err);
+                        res.sendStatus(500);
+                    } else {
+                        res.status(200).json(charge);
+                    }
+                });
+            } catch (err) {
+                res.sendStatus(500);
+                next(`Error adding token to customer: ${err.message}`);
+            }
+
+        } else {
+            res.sendStatus(422);
+        }
+    } else {
+        res.sendStatus(422);
+    }
 });
 
 //for generating customer object in Stripe
