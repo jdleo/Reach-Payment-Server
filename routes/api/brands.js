@@ -24,28 +24,30 @@ router.post('/me/ephemeral_keys/', async (req, res, next) => {
 
 //for creating destination charge
 router.post('/charge', async (req, res, next) => {
-    if (req.body.amount && req.body.destination && req.body.source) {
-    	//variables
-        var amount = parseInt(req.body.amount);
+    if (req.body.amount && req.body.destination && req.body.source && req.body.customer) {
+        //variables
+        var amount = req.body.amount;
         var destination = req.body.destination;
         var source = req.body.source;
+        var customer = req.body.customer;
         var fee = 0.06
 
         if (!isNaN(amount)) {
-            //amount is parseable to int, calculate transfer amount
-            var amountToDestination = (amount - 30) / (1 + fee);
-            //calculate amount after fees
-            var totalFees = amount - amountToDestination;
-
-            //console.log(amount, amountToDestination, totalFees);
-
+            //amount is parseable to int
+            var amount = parseInt(amount);
+            //calculate fees
+            var fees = amount * fees;
+            //calculate total with fees (parseInt just in case)
+            var totalWithFees = parseInt(amount + fees);
+            //try to create stripe charge
             try {
                 stripe.charges.create({
-                    amount: amount,
+                    amount: totalWithFees,
                     currency: "usd",
                     source: source,
+                    customer: customer,
                     transfer_data: {
-                        amount: amountToDestination,
+                        amount: amount,
                         destination: destination,
                     },
                 }).then(function(charge) {
@@ -53,14 +55,17 @@ router.post('/charge', async (req, res, next) => {
                     res.status(200).json(charge);
                 });
             } catch (err) {
+                //send 500
                 res.sendStatus(500);
                 next(`Error adding token to customer: ${err.message}`);
             }
 
         } else {
+            //send 422
             res.sendStatus(422);
         }
     } else {
+        //send 422
         res.sendStatus(422);
     }
 });
@@ -78,7 +83,7 @@ router.post('/me/create', async (req, res, next) => {
                     //console.log(err);
                     res.sendStatus(500);
                 } else {
-                    res.status(200).send(customer.id);
+                    res.status(200).json(customer);
                 }
             });
         } catch (err) {
