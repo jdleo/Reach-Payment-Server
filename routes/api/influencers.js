@@ -1,4 +1,4 @@
-const pk = "sk_test_t1rMxmpgLmoCQV4g1p2LfExG0080oRaHN4";
+const pk = process.env.STRIPE_PRIVATE_KEY;
 const stripe = require('stripe')(pk);
 const express = require('express');
 const router = express.Router();
@@ -11,6 +11,34 @@ stripe.setApiVersion("2019-05-16");
 //root
 router.get('/', (req, res) => {
     res.send('api/influencers endpoint');
+});
+
+//for retrieving Connect account balance
+router.post('/me/balance', async (req, res, next) => {
+    if (req.body.account_id) {
+        //try to generate dashboard link
+        try {
+            stripe.balance.retrieve({
+              stripe_account: req.body.account_id
+            }, function(err, balance) {
+              // asynchronously called
+              if (err) {
+                //send 500
+                res.sendStatus(500);
+              } else {
+                //send 200 with json
+                res.status(200).json(balance);
+              }
+            });
+        } catch (err) {
+            //send 500
+            res.sendStatus(500);
+            next(`Error generating dashboard link: ${err.message}`);
+        }
+    } else {
+        //send 422
+        res.sendStatus(422);
+    }
 });
 
 //for generating dashboard link (Stripe Express account)
