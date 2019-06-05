@@ -37,7 +37,7 @@ router.post('/charge', async (req, res, next) => {
             //calculate amount after fees
             var totalFees = amount - amountToDestination;
 
-            console.log(amount, amountToDestination, totalFees);
+            //console.log(amount, amountToDestination, totalFees);
 
             try {
                 stripe.charges.create({
