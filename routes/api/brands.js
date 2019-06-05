@@ -33,7 +33,7 @@ router.post('/charge', async (req, res, next) => {
 
         if (!isNaN(amount)) {
             //amount is parseable to int, calculate transfer amount
-            var amountToDestination = amount / (1 + fee);
+            var amountToDestination = (amount - 300) / (1 + fee);
             //calculate amount after fees
             var totalFees = amount - amountToDestination;
 
@@ -48,14 +48,9 @@ router.post('/charge', async (req, res, next) => {
                         amount: amountToDestination,
                         destination: destination,
                     },
-                }).then(function(err, charge) {
-                    // asynchronously called
-                    if (err) {
-                        //console.log(err);
-                        res.sendStatus(500);
-                    } else {
-                        res.status(200).json(charge);
-                    }
+                }).then(function(charge) {
+                    //send charge data as json
+                    res.status(200).json(charge);
                 });
             } catch (err) {
                 res.sendStatus(500);
