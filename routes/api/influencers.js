@@ -13,8 +13,38 @@ router.get('/', (req, res) => {
     res.send('api/influencers endpoint');
 });
 
+//for retrieving list of payouts
+router.post('/me/payouts', async (req, res, next) => {
+    if (req.body.account_id) {
+        //try to generate dashboard link
+        try {
+            stripe.payouts.list({
+                limit: 100,
+                destination: req.body.account_id
+            }, function(err, transfers) {
+                    // asynchronously called
+                if (err) {
+                    //send 500
+                    res.sendStatus(500);
+                } else {
+                    //send 200 with json
+                    res.status(200).json(transfers);
+                }
+                }
+            );
+        } catch (err) {
+            //send 500
+            res.sendStatus(500);
+            next(`Error retrieving payouts: ${err.message}`);
+        }
+    } else {
+        //send 422
+        res.sendStatus(422);
+    }
+});
+
 //for retrieving list of transfers
-router.post('/me/tansfers', async (req, res, next) => {
+router.post('/me/transfers', async (req, res, next) => {
     if (req.body.account_id) {
         //try to generate dashboard link
         try {
@@ -35,7 +65,7 @@ router.post('/me/tansfers', async (req, res, next) => {
         } catch (err) {
             //send 500
             res.sendStatus(500);
-            next(`Error generating dashboard link: ${err.message}`);
+            next(`Error retrieving transfers: ${err.message}`);
         }
     } else {
         //send 422
