@@ -13,22 +13,52 @@ router.get('/', (req, res) => {
     res.send('api/influencers endpoint');
 });
 
+//for retrieving list of transfers
+router.post('/me/tansfers', async (req, res, next) => {
+    if (req.body.account_id) {
+        //try to generate dashboard link
+        try {
+            stripe.transfers.list({
+                limit: 100,
+                destination: req.body.account_id
+            }, function(err, transfers) {
+                    // asynchronously called
+                if (err) {
+                    //send 500
+                    res.sendStatus(500);
+                } else {
+                    //send 200 with json
+                    res.status(200).json(transfers);
+                }
+                }
+            );
+        } catch (err) {
+            //send 500
+            res.sendStatus(500);
+            next(`Error generating dashboard link: ${err.message}`);
+        }
+    } else {
+        //send 422
+        res.sendStatus(422);
+    }
+});
+
 //for retrieving Connect account balance
 router.post('/me/balance', async (req, res, next) => {
     if (req.body.account_id) {
         //try to generate dashboard link
         try {
             stripe.balance.retrieve({
-              stripe_account: req.body.account_id
+                stripe_account: req.body.account_id
             }, function(err, balance) {
-              // asynchronously called
-              if (err) {
-                //send 500
-                res.sendStatus(500);
-              } else {
-                //send 200 with json
-                res.status(200).json(balance);
-              }
+                // asynchronously called
+                if (err) {
+                    //send 500
+                    res.sendStatus(500);
+                } else {
+                    //send 200 with json
+                    res.status(200).json(balance);
+                }
             });
         } catch (err) {
             //send 500
@@ -68,7 +98,7 @@ router.post('/me/dashboard', async (req, res, next) => {
     }
 });
 
-//for generating customer id from auth token
+//for generating connect id from auth token
 router.post('/me/account_id', async (req, res, next) => {
     if (req.body.auth_code) {
         var dataString = `client_secret=${pk}&code=${req.body.auth_code}&grant_type=authorization_code`;
@@ -85,6 +115,7 @@ router.post('/me/account_id', async (req, res, next) => {
                 res.status(200).json(body);
             } else {
                 //send 500
+                console.log(response);
                 res.sendStatus(500);
             }
         }
