@@ -16,27 +16,33 @@ router.get('/', (req, res) => {
 //for retrieving list of payouts
 router.post('/me/payouts', async (req, res, next) => {
     if (req.body.account_id) {
-        //try to generate dashboard link
-        try {
-            stripe.payouts.list({
-                limit: 100,
-                destination: req.body.account_id
-            }, function(err, transfers) {
-                    // asynchronously called
-                if (err) {
-                    //send 500
-                    res.sendStatus(500);
-                } else {
-                    //send 200 with json
-                    res.status(200).json(transfers);
-                }
-                }
-            );
-        } catch (err) {
-            //send 500
-            res.sendStatus(500);
-            next(`Error retrieving payouts: ${err.message}`);
+
+        var headers = {
+            'Stripe-Account': req.body.account_id
+        };
+
+        var options = {
+            url: 'https://api.stripe.com/v1/payouts?limit=100',
+            headers: headers,
+            auth: {
+                'user': pk,
+                'pass': '',
+
+            }
+        };
+
+        function callback(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                //send body
+                res.status(200).json(body);
+            } else {
+                //send 500
+                //console.log(response);
+                res.sendStatus(500);
+            }
         }
+
+        request(options, callback);
     } else {
         //send 422
         res.sendStatus(422);
@@ -52,7 +58,7 @@ router.post('/me/transfers', async (req, res, next) => {
                 limit: 100,
                 destination: req.body.account_id
             }, function(err, transfers) {
-                    // asynchronously called
+                // asynchronously called
                 if (err) {
                     //send 500
                     res.sendStatus(500);
@@ -60,8 +66,7 @@ router.post('/me/transfers', async (req, res, next) => {
                     //send 200 with json
                     res.status(200).json(transfers);
                 }
-                }
-            );
+            });
         } catch (err) {
             //send 500
             res.sendStatus(500);
@@ -145,7 +150,7 @@ router.post('/me/account_id', async (req, res, next) => {
                 res.status(200).json(body);
             } else {
                 //send 500
-                console.log(response);
+                //console.log(response);
                 res.sendStatus(500);
             }
         }
